@@ -1,5 +1,5 @@
 {
-	"name": "backend",
+	"name": "devices-simulator",
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
@@ -8,18 +8,15 @@
 		"prod": "node dist/index.js",
 		"build": "tsc"
 	},
-	"type": "module",
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"type": "commonjs",
 	"dependencies": {
-		"cors": "^2.8.6",
-		"express": "^5.2.1",
-		"socket.io": "^4.8.3"
+		"socket.io-client": "^4.8.3"
 	},
 	"devDependencies": {
-		"@types/express": "^5.0.6",
-		"@types/node": "^25.9.3",
+		"@types/node": "^26.0.0",
 		"tsx": "^4.22.4",
 		"typescript": "^6.0.3"
 	}

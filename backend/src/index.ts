@@ -1,24 +1,19 @@
 import express from "express";
 import router from "./routes.js";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import { type Socket } from "socket.io-client";
+import cors from "cors";
+import socketSetup from "./socketSetup.js";
+import { createServer } from "node:http";
 
 const app = express();
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-	cors: {
+app.use(
+	cors({
 		origin: "*",
-		methods: ["GET", "POST"],
-	},
-});
+	}),
+);
 
-io.on('connection', (socket: Socket) => {
-    console.log(`Socket ${socket.id} connected`)
-
-    socket.on('')
-})
+socketSetup(httpServer);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -27,4 +22,4 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", router);
 
 const PORT = 5000;
-app.listen(PORT, () => console.log(`Backend Running [${PORT}]`));
+httpServer.listen(PORT, () => console.log(`Backend Running [${PORT}]`));

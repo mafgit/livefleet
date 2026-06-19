@@ -1,0 +1,113 @@
+import { io, type Socket } from "socket.io-client";
+
+// const socket = socket.on("connect", () => {
+// 	console.log("Device simulator connected to backend websocket");
+// });
+
+// socket.on("disconnect", () => {
+// 	console.log("Device simulator disconnected from backend websocket");
+// });
+
+const validRegions = {
+	karachi: { lat: 24.861, lng: 66.9905 },
+	lahore: { lat: 31.582, lng: 74.3294 },
+};
+const validRegionIds = Object.keys(validRegions);
+const numValidRegions = validRegionIds.length;
+
+let devices: Record<
+	string,
+	{
+		lat: number;
+		lng: number;
+		regionId: keyof typeof validRegions;
+		socket: Socket;
+	}
+>;
+
+process.on("SIGINT", () => {
+	console.log("Keyboard interrupt detected");
+
+	Object.values(devices).forEach((d) => {
+		if (d.socket.connected) d.socket.disconnect();
+	});
+
+	process.exit(0);
+});
+
+async function simulate(numDevices: number, seconds: number) {
+	console.log(`Simulating ${numDevices} devices`);
+
+	devices = {};
+
+	let device;
+	for (let t = 0; t < seconds; t++) {
+		if ((t + 1) % 5 === 0) console.log(`\nStep ${t + 1}/${seconds}`);
+
+		for (let d = 0; d < numDevices; d++) {
+			const deviceId = "device-" + d;
+
+			if (!(deviceId in devices)) {
+				const dx = Math.random() * 0.3 - 0.15; // -0.15 to 0.15
+				const dy = Math.random() * 0.3 - 0.15;
+				const { regionId, lat, lng } = getRandomRegionAndCenter();
+				const newLat = lat + dx;
+				const newLng = lng + dy;
+
+				devices[deviceId] = {
+					lat: newLat,
+					lng: newLng,
+					regionId: regionId,
+					socket: io("http://localhost:5000", {
+						query: { deviceId: deviceId },
+						forceNew: true,
+						multiplex: false,
+					}),
+				};
+
+				device = devices[deviceId];
+				// console.log(device.regionId);
+			} else {
+				device = devices[deviceId];
+				const dx = Math.random() * (0.00013 - 0.0001) + 0.0001;
+				const dy = Math.random() * (0.00013 - 0.0001) + 0.0001;
+
+				const newLat = device.lat + (Math.random() < 0.5 ? -1 : 1) * dx;
+				const newLng = device.lng + (Math.random() < 0.5 ? -1 : 1) * dx;
+				device.lat = newLat;
+				device.lng = newLng;
+			}
+
+			device.socket.emit("driver-ping", {
+				deviceId: deviceId,
+				regionId: devices[deviceId].regionId,
+				lat: devices[deviceId].lat,
+				lng: devices[deviceId].lng,
+			});
+		}
+
+		await delay(Math.random() * 2000);
+	}
+
+	Object.values(devices).forEach((d) => {
+		if (d.socket.connected) d.socket.disconnect();
+	});
+}
+
+function getRandomRegionAndCenter() {
+	const regionId = validRegionIds[
+		Math.floor(Math.random() * numValidRegions)
+	] as keyof typeof validRegions;
+	const { lat, lng } = validRegions[regionId];
+	return { regionId, lat, lng };
+}
+
+function delay(ms: number) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function clamp(x: number, min: number, max: number) {
+	return Math.min(Math.max(x, max), min);
+}
+
+simulate(5, 100);
