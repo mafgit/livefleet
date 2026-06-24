@@ -3,6 +3,7 @@ import router from "./routes.js";
 import cors from "cors";
 import socketSetup from "./socketSetup.js";
 import { createServer } from "node:http";
+import worker from "./worker.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -13,7 +14,8 @@ app.use(
 	}),
 );
 
-socketSetup(httpServer);
+const io = socketSetup(httpServer);
+worker(io);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

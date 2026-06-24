@@ -8,10 +8,10 @@ export default function MapClicker({
 	destCoord,
 	setDestCoord,
 }: {
-	setPickupCoord: React.Dispatch<React.SetStateAction<LatLngObj>>;
-	pickupCoord: LatLngObj;
-	destCoord: LatLngObj;
-	setDestCoord: React.Dispatch<React.SetStateAction<LatLngObj>>;
+	setPickupCoord: React.Dispatch<React.SetStateAction<LatLngObj | null>>;
+	pickupCoord: LatLngObj | null;
+	destCoord: LatLngObj | null;
+	setDestCoord: React.Dispatch<React.SetStateAction<LatLngObj | null>>;
 	step: number;
 }) {
 	const map = useMapEvents({

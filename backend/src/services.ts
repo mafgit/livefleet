@@ -1,13 +1,8 @@
-export const drivers: {
-	lat: number;
-	lng: number;
-	driverId: string;
-	timestamp: number;
-}[] = [];
+import * as data from "./data.js";
 
 export async function getNearbyDrivers(
 	lat: number,
 	lng: number,
-): Promise<{ driverId: string; lat: number; lng: number }[]> {
-	return drivers;
+): Promise<Record<string, { lat: number; lng: number }>> {
+	return data.drivers;
 }

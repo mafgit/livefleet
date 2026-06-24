@@ -1,15 +1,11 @@
 import type { Request, Response } from "express";
 import * as services from "./services.js";
 import { z } from "zod";
+import { LatLngSchema } from "./schemas.js";
 
 export function hello(req: Request, res: Response) {
 	res.send("Hello");
 }
-
-const LatLngSchema = z.object({
-	lat: z.preprocess((x) => (x === "" ? undefined : x), z.coerce.number()),
-	lng: z.preprocess((x) => (x === "" ? undefined : x), z.coerce.number()),
-});
 
 export async function getNearbyDrivers(req: Request, res: Response) {
 	try {

@@ -9,10 +9,11 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import MapClicker from "./MapClicker";
-import { RefObject, useEffect } from "react";
+import { RefObject } from "react";
 import "leaflet/dist/leaflet.css";
 import { LatLngObj } from "@/types/LatLngObj";
 import { DriverIdLatLng } from "@/types/DriverIdLatLng";
+import { vehicleIcon } from "@/app/constants/leafletIcons";
 
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
@@ -34,11 +35,11 @@ export default function SelectionMap({
 	drivers,
 	leafletMapRef,
 }: {
-	userCoord: LatLngObj;
-	pickupCoord: LatLngObj;
-	destCoord: LatLngObj;
-	setPickupCoord: React.Dispatch<React.SetStateAction<LatLngObj>>;
-	setDestCoord: React.Dispatch<React.SetStateAction<LatLngObj>>;
+	userCoord: LatLngObj | null;
+	pickupCoord: LatLngObj | null;
+	destCoord: LatLngObj | null;
+	setPickupCoord: React.Dispatch<React.SetStateAction<LatLngObj | null>>;
+	setDestCoord: React.Dispatch<React.SetStateAction<LatLngObj | null>>;
 	step: number;
 	refMap: RefObject<Map<string, L.Marker>>;
 	drivers: DriverIdLatLng[];
@@ -49,6 +50,7 @@ export default function SelectionMap({
 			ref={leafletMapRef}
 			center={userCoord}
 			zoom={26}
+			zoomControl={false}
 			style={{ width: "100%", height: "100%" }}
 		>
 			<TileLayer
@@ -67,17 +69,24 @@ export default function SelectionMap({
 			{step > 1 && pickupCoord && (
 				<Circle
 					center={[pickupCoord.lat, pickupCoord.lng]}
-					radius={300}
+					radius={1500}
 				/>
 			)}
 
 			{step > 2 && pickupCoord && destCoord && (
-				<Polygon positions={[pickupCoord, destCoord]} />
+				<Polygon
+					positions={[pickupCoord, destCoord]}
+					weight={4}
+					dashArray={[1, 10]}
+				>
+					<Popup>No info</Popup>
+				</Polygon>
 			)}
 
 			{step > 1 ? (
 				drivers.map((d: DriverIdLatLng) => (
 					<Marker
+						icon={vehicleIcon}
 						key={d.driverId}
 						ref={(element) => {
 							if (element) {
@@ -88,7 +97,7 @@ export default function SelectionMap({
 								refMap.current.delete(d.driverId);
 							}
 						}}
-						position={[24, 66]} // todo: remove fake position
+						position={[d.lat, d.lng]} // todo: remove fake position
 					>
 						<Popup>Driver ID: {d.driverId}</Popup>
 					</Marker>
