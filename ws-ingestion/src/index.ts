@@ -1,19 +1,18 @@
-import { initRedisPubSubClients, pubClient, subClient } from "./redisClients";
+import { createRedisPubSubClients } from "./redisClients";
 import { io } from "./createIOServer";
 import { attachSocketListeners } from "./attachSocketListeners";
-import { createAdapter } from "@socket.io/redis-adapter";
 import { attachChannelSubscriptions } from "./attachChannelSubscriptions";
 
 main();
 
 async function main() {
-	await initRedisPubSubClients();
+	await createRedisPubSubClients();
 
-	io.adapter(createAdapter(pubClient, subClient));
-	
-    attachChannelSubscriptions()
+	attachChannelSubscriptions();
 
-    attachSocketListeners();
-	
-    io.listen(8080);
+	attachSocketListeners();
+
+	const PORT = parseInt(process.env.PORT as string) || 8080;
+	io.listen(PORT);
+	console.log(`Websocket ingestion server started [${PORT}]`);
 }

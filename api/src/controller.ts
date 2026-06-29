@@ -8,6 +8,8 @@ export function hello(req: Request, res: Response) {
 
 export async function getNearbyDrivers(req: Request, res: Response) {
 	try {
+        console.log('GET getNearbyDrivers');
+        
 		const { lat, lng } = LatLngSchema.parse(req.query);
 		const drivers = await services.getNearbyDrivers(lat, lng);
 		res.json({ drivers });

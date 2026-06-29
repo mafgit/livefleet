@@ -3,7 +3,7 @@ import { redisClient } from "./redisClient";
 const regions = [{ id: "global", latitude: 0, longitude: 0, radiusKm: 20000 }];
 
 export default function ticker() {
-	console.log("Worker has started");
+	console.log("Ticker has started");
 
 	setInterval(async () => {
 		const promises = [];
@@ -23,17 +23,19 @@ export default function ticker() {
 			string,
 			{
 				member: string;
-				coordinates: { latitude: number; longitude: number };
+				coordinates?: { latitude: number; longitude: number };
 			}[]
 		> = {};
 
 		regionDriversArray.forEach((drivers, i) => {
-			if (drivers) regionDrivers[regions[i].id] = drivers;
+			if (drivers) {
+				regionDrivers[regions[i].id] = drivers;
+			}
 		});
 
 		const payload = { timestamp: Date.now(), regionDrivers };
 
-		console.log(payload["regionDrivers"]["global"]);
+		// console.log(payload["regionDrivers"]["global"]);
 		redisClient.publish("channel:batch_pings", JSON.stringify(payload));
 	}, 2000);
 }

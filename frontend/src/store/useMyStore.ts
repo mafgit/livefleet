@@ -4,7 +4,6 @@ import { ViewType } from "@/types/ViewType";
 import { create } from "zustand";
 import { io, type Socket } from "socket.io-client";
 import { radius } from "@/constants/radius";
-import { latLng } from "leaflet";
 
 interface MyStoreType {
 	pickupCoord: LatLngObj | null;
@@ -67,7 +66,7 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 			_seenDriverIds,
 		} = get();
 		if (view === "global") return;
-		if (_leafletMapRef.current) {
+		if (_leafletMapRef.current && typeof window !== "undefined") {
 			try {
 				clearStepsMarkersDrivers();
 				const bounds = _leafletMapRef.current.getBounds();
@@ -76,12 +75,12 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 				const center = bounds.getCenter();
 
 				const heightM = _leafletMapRef.current.distance(
-					latLng(sw.lat, center.lng),
-					latLng(ne.lat, center.lng),
+					{ lat: sw.lat, lng: center.lng },
+					{ lat: ne.lat, lng: center.lng },
 				);
 				const widthM = _leafletMapRef.current.distance(
-					latLng(center.lat, sw.lng),
-					latLng(center.lat, ne.lng),
+					{ lat: center.lat, lng: sw.lng },
+					{ lat: center.lat, lng: ne.lng },
 				);
 				const res = await fetch(
 					`http://localhost:5000/drivers/bounding-box?centerlat=${center.lat}&centerlng=${center.lng}&widthm=${widthM}&heightm=${heightM}`,
@@ -143,7 +142,7 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 	socketConnectAndJoin: () => {
 		const { _socket } = get();
 		if (!_socket.current.connected) _socket.current.connect();
-		_socket.current.emit("join-frontends");
+		_socket.current.emit("join-frontends", "global");
 	},
 
 	moveForwardToStep2: async (pickupCoord: LatLngObj) => {
@@ -191,7 +190,22 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 
 		_socket.current.on(
 			"driver-ping-batch",
-			(batch: Record<string, LatLngObj>, expired: string[]) => {
+			(
+				batch: {
+					timestamp: number;
+					regionDrivers: Record<
+						string,
+						{
+							member: string;
+							coordinates: {
+								latitude: number;
+								longitude: number;
+							};
+						}
+					>[];
+				},
+				expired: string[],
+			) => {
 				const { view, pickupCoord } = get(); // get non-stale view on each ping
 				console.log("Received driver-ping-batch", view);
 
@@ -203,9 +217,12 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 				let gotOutOfBoundSet = new Set();
 
 				// processing new batch of pings
-				for (const key in batch) {
-					if (_seenDriverIds.current.has(key)) {
-						const marker = _refMap.current.get(key);
+
+				// todo: this logic has to be made again
+
+				for (const member in batch.regionDrivers) {
+					if (_seenDriverIds.current.has(member)) {
+						const marker = _refMap.current.get(member);
 
 						if (marker) {
 							let deleteMarker = true;
@@ -213,11 +230,11 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 							if (view === "ride") {
 								if (pickupCoord) {
 									if (
-                                        true
+										true
 										// isPointWithinRadius(
 										// 	{
-										// 		lat: batch[key].lat,
-										// 		lng: batch[key].lng,
+										// 		lat: batch[member].lat,
+										// 		lng: batch[member].lng,
 										// 	},
 										// 	pickupCoord,
 										// 	radius,
@@ -233,14 +250,14 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 
 							if (!deleteMarker) {
 								marker.setLatLng([
-									batch[key].lat,
-									batch[key].lng,
+									batch[member].lat,
+									batch[member].lng,
 								]);
 							} else {
 								// delete, if present in oldDrivers, and seenDriverIds
-								gotOutOfBoundSet.add(key); // to filter away out of bound and expired in one pass outside
-								_refMap.current.delete(key);
-								_seenDriverIds.current.delete(key);
+								gotOutOfBoundSet.add(member); // to filter away out of bound and expired in one pass outside
+								_refMap.current.delete(member);
+								_seenDriverIds.current.delete(member);
 							}
 						}
 					} else {
@@ -254,7 +271,7 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 						} else {
 							if (
 								pickupCoord &&
-                                true
+								true
 								// isPointWithinRadius(
 								// 	{
 								// 		lat: batch[key].lat,
@@ -269,10 +286,10 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 						}
 
 						if (addNew) {
-							_seenDriverIds.current.add(key);
+							_seenDriverIds.current.add(member);
 							oldDrivers.push({
-								...batch[key],
-								driverId: key,
+								...batch[member],
+								driverId: member,
 							});
 							changeState = true;
 						}
@@ -312,7 +329,7 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 		const { _seenDriverIds, _refMap, _socket } = get();
 		_seenDriverIds.current.clear();
 		_refMap.current.clear();
-		_socket.current.emit("leave-frontends");
+		_socket.current.emit("leave-frontends", "global");
 		_socket.current.off("driver-ping");
 	},
 
