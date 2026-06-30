@@ -3,16 +3,34 @@ import RideSteps from "@/components/RideSteps";
 import RidePageTop from "@/components/RidePageTop";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
-import { useMyStore } from "@/store/useMyStore";
+import { useStateStore } from "@/store/useStateStore";
 
 const SelectionMapNoSSR = dynamic(() => import("@/components/SelectionMap"), {
 	ssr: false,
 });
 
 export default function page() {
-	const requestUserCoord = useMyStore((s) => s.requestUserCoord);
+	const setUserCoord = useStateStore((s) => s.setUserCoord);
+
 	useEffect(() => {
-		requestUserCoord();
+		// ---------------- requesting user location --------------
+
+		if (typeof window === "undefined" || !navigator.geolocation) return;
+
+		navigator.geolocation.getCurrentPosition(
+			(pos) => {
+				setUserCoord({
+					lat: pos.coords.latitude,
+					lng: pos.coords.longitude,
+				});
+			},
+			(err) => alert(err.message),
+			{
+				enableHighAccuracy: true,
+				timeout: 10000,
+				maximumAge: 60000, // accept cached if within this milliseconds old
+			},
+		);
 	}, []);
 
 	return (

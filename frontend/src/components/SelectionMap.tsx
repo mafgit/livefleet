@@ -12,7 +12,9 @@ import MapClicker from "./MapClicker";
 import "leaflet/dist/leaflet.css";
 import { DriverIdLatLng } from "@/types/DriverIdLatLng";
 import { vehicleIcon } from "@/app/constants/leafletIcons";
-import { useMyStore } from "@/store/useMyStore";
+import { useStateStore } from "@/store/useStateStore";
+import { useEffect, useRef } from "react";
+import mapManager from "@/managers/mapManager";
 
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
@@ -23,21 +25,21 @@ L.Icon.Default.mergeOptions({
 	shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
-export default function SelectionMap({}: {}) {
-	const _leafletMapRef = useMyStore((s) => s._leafletMapRef);
-	const userCoord = useMyStore((s) => s.userCoord);
-	const view = useMyStore((s) => s.view);
-	const step = useMyStore((s) => s.step);
-	const pickupCoord = useMyStore((s) => s.pickupCoord);
-	const destCoord = useMyStore((s) => s.destCoord);
-	const drivers = useMyStore((s) => s.drivers);
-	const _refMap = useMyStore((s) => s._refMap);
+export default function SelectionMap() {
+	const userCoord = useStateStore((s) => s.userCoord);
+	const view = useStateStore((s) => s.view);
+	const step = useStateStore((s) => s.step);
+	const pickupCoord = useStateStore((s) => s.pickupCoord);
+	const destCoord = useStateStore((s) => s.destCoord);
+	const drivers = useStateStore((s) => s.drivers);
 
-	const shouldRenderMarkers = view === "global" || step > 1;
+	const shouldRenderMarkers = view === "GLOBAL" || step > 1;
 
 	return userCoord ? (
 		<MapContainer
-			ref={_leafletMapRef}
+			ref={(mapInstance) => {
+				if (mapInstance) mapManager.initializeLeafletMap(mapInstance);
+			}}
 			center={userCoord}
 			zoom={26}
 			zoomControl={false}
@@ -48,7 +50,7 @@ export default function SelectionMap({}: {}) {
 				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 			/>
 
-			{view === "ride" ? (
+			{view === "RIDE" ? (
 				<>
 					<MapClicker />
 
@@ -81,10 +83,15 @@ export default function SelectionMap({}: {}) {
 						ref={(element) => {
 							if (element) {
 								// mounted
-								_refMap.current.set(d.driverId, element);
+								mapManager.driverIdToMarkerRefMap.set(
+									d.driverId,
+									element,
+								);
 							} else {
 								// unmounted
-								_refMap.current.delete(d.driverId);
+								mapManager.driverIdToMarkerRefMap.delete(
+									d.driverId,
+								);
 							}
 						}}
 						position={[d.lat, d.lng]} // bug: on view change or any state change that rerenders this, position will reset to this

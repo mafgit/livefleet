@@ -1,1 +1,1 @@
-export type ViewType = "ride" | "global";
+export type ViewType = "RIDE" | "GLOBAL";

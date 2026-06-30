@@ -1,18 +1,18 @@
-import { useMyStore } from "@/store/useMyStore";
+import { useStateStore } from "@/store/useStateStore";
 
 export default function RideSteps() {
-	const step = useMyStore((s) => s.step);
-	const view = useMyStore((s) => s.view);
-	const moveToNextStep = useMyStore((s) => s.moveToNextStep);
-	const moveToPrevStep = useMyStore((s) => s.moveToPrevStep);
-	const pickupCoord = useMyStore((s) => s.pickupCoord);
-	const destCoord = useMyStore((s) => s.destCoord);
+	const step = useStateStore((s) => s.step);
+	const view = useStateStore((s) => s.view);
+	const moveToNextStep = useStateStore((s) => s.moveToNextStep);
+	const moveToPrevStep = useStateStore((s) => s.moveToPrevStep);
+	const pickupCoord = useStateStore((s) => s.pickupCoord);
+	const destCoord = useStateStore((s) => s.destCoord);
 
 	return (
 		<div
 			className={
 				"z-20 absolute bottom-[16px] left-0 flex items-center justify-center w-full transform duration-300 " +
-				(view === "global" ? "translate-y-30" : "translate-y-0")
+				(view === "GLOBAL" ? "translate-y-30" : "translate-y-0")
 			}
 		>
 			<div className="px-4 py-2 items-center flex gap-2 justify-between flex-wrap text-white w-[95%] bg-primary/85 rounded-md">

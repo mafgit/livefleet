@@ -1,13 +1,12 @@
-import { useMyStore } from "@/store/useMyStore";
-import { LatLngObj } from "@/types/LatLngObj";
+import { useStateStore } from "@/store/useStateStore";
 import { Marker, Popup, useMapEvents } from "react-leaflet";
 
 export default function MapClicker() {
-	const step = useMyStore((s) => s.step);
-	const pickupCoord = useMyStore((s) => s.pickupCoord);
-	const destCoord = useMyStore((s) => s.destCoord);
-	const setPickupCoord = useMyStore((s) => s.setPickupCoord);
-	const setDestCoord = useMyStore((s) => s.setDestCoord);
+	const step = useStateStore((s) => s.step);
+	const pickupCoord = useStateStore((s) => s.pickupCoord);
+	const destCoord = useStateStore((s) => s.destCoord);
+	const setPickupCoord = useStateStore((s) => s.setPickupCoord);
+	const setDestCoord = useStateStore((s) => s.setDestCoord);
 
 	const map = useMapEvents({
 		// todo: closure of step variable might be an issue later

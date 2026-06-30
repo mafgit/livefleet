@@ -1,10 +1,10 @@
-import { useMyStore } from "@/store/useMyStore";
+import { useStateStore } from "@/store/useStateStore";
 import { ViewType } from "@/types/ViewType";
 
 export default function RidePageTop() {
-	const view = useMyStore((s) => s.view);
-	const changeViewToGlobal = useMyStore((s) => s.changeViewToGlobal);
-	const changeViewToRide = useMyStore((s) => s.changeViewToRide);
+	const view = useStateStore((s) => s.view);
+	const changeViewToGlobal = useStateStore((s) => s.changeViewToGlobal);
+	const changeViewToRide = useStateStore((s) => s.changeViewToRide);
 
 	return (
 		<>
@@ -17,7 +17,7 @@ export default function RidePageTop() {
 					onClick={changeViewToRide}
 					className={
 						"px-2 py-1 text-sm rounded-l-md " +
-						(view === "ride"
+						(view === "RIDE"
 							? "bg-accent text-black"
 							: "opacity-90 bg-white/85 text-black")
 					}
@@ -28,7 +28,7 @@ export default function RidePageTop() {
 					onClick={changeViewToGlobal}
 					className={
 						"px-2 py-1 text-sm rounded-r-md " +
-						(view === "global"
+						(view === "GLOBAL"
 							? "bg-accent text-black"
 							: "opacity-90 bg-white/85 text-black")
 					}
