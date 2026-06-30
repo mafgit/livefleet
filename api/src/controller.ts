@@ -8,8 +8,8 @@ export function hello(req: Request, res: Response) {
 
 export async function getNearbyDrivers(req: Request, res: Response) {
 	try {
-        console.log('GET getNearbyDrivers');
-        
+		console.log("GET getNearbyDrivers", req.query);
+
 		const { lat, lng } = LatLngSchema.parse(req.query);
 		const drivers = await services.getNearbyDrivers(lat, lng);
 		res.json({ drivers });
@@ -20,6 +20,8 @@ export async function getNearbyDrivers(req: Request, res: Response) {
 
 export async function getDriversInBoundingBox(req: Request, res: Response) {
 	try {
+		console.log("GET getDriversInBoundingBox", req.query);
+
 		const bbox = BoundingBoxSchema.parse(req.query);
 		const drivers = await services.getDriversInBoundingBox(bbox);
 		res.json({ drivers });

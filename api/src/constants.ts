@@ -1,1 +1,1 @@
-export const radius = 1500
+export const RADIUS = 1500

@@ -16,9 +16,10 @@ function handleBatchPings(msg: string) {
 				string,
 				{
 					member: string;
-					coordinates: { latitude: number; longitude: number };
-				}
-			>[];
+					latitude: number;
+					longitude: number;
+				}[]
+			>;
 		} = JSON.parse(msg);
 
 		for (const region in payload.regionDrivers) {

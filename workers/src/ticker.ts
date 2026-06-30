@@ -1,41 +1,54 @@
+import ngeohash from "ngeohash";
 import { redisClient } from "./redisClient";
-
-const regions = [{ id: "global", latitude: 0, longitude: 0, radiusKm: 20000 }];
+import { HASH_PRECISION } from "./constants";
 
 export default function ticker() {
 	console.log("Ticker has started");
 
 	setInterval(async () => {
-		const promises = [];
-		for (const region of regions) {
-			promises.push(
-				redisClient.geoSearchWith(
-					"drivers:active",
-					{ latitude: region.latitude, longitude: region.longitude },
-					{ radius: region.radiusKm, unit: "km" },
-					["WITHCOORD"],
-				),
-			);
-		}
+		const allDrivers = await redisClient.geoSearchWith(
+			"drivers:active",
+			{ latitude: 0, longitude: 0 },
+			{ radius: 20000, unit: "km" },
+			["WITHCOORD"],
+		);
 
-		const regionDriversArray = await Promise.all(promises);
 		const regionDrivers: Record<
 			string,
-			{
-				member: string;
-				coordinates?: { latitude: number; longitude: number };
-			}[]
+			{ member: string; latitude: number; longitude: number }[]
 		> = {};
 
-		regionDriversArray.forEach((drivers, i) => {
-			if (drivers) {
-				regionDrivers[regions[i].id] = drivers;
+		for (const driver of allDrivers) {
+			if (!driver.coordinates) {
+				continue;
 			}
-		});
+
+			const {
+				member,
+				coordinates: { latitude, longitude },
+			} = driver;
+
+			const hash = ngeohash.encode(
+				driver.coordinates.latitude,
+				driver.coordinates.longitude,
+				HASH_PRECISION,
+			);
+
+			const driverObj = {
+				member,
+				latitude,
+				longitude,
+			};
+
+			if (hash in regionDrivers) {
+				regionDrivers[hash].push(driverObj);
+			} else {
+				regionDrivers[hash] = [driverObj];
+			}
+		}
 
 		const payload = { timestamp: Date.now(), regionDrivers };
 
-		// console.log(payload["regionDrivers"]["global"]);
 		redisClient.publish("channel:batch_pings", JSON.stringify(payload));
 	}, 2000);
 }

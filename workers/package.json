@@ -14,10 +14,12 @@
 	"type": "commonjs",
 	"dependencies": {
 		"@types/redis": "^4.0.10",
+		"ngeohash": "^0.6.3",
 		"redis": "^6.0.1",
 		"socket.io": "^4.8.3"
 	},
 	"devDependencies": {
+		"@types/ngeohash": "^0.6.8",
 		"@types/node": "^26.0.1",
 		"tsx": "^4.22.4",
 		"typescript": "^6.0.3"

@@ -3,7 +3,7 @@ import { LatLngObj } from "@/types/LatLngObj";
 import { ViewType } from "@/types/ViewType";
 import { create } from "zustand";
 import { io, type Socket } from "socket.io-client";
-import { radius } from "@/constants/radius";
+import { RADIUS } from "@/constants/radius";
 
 interface MyStoreType {
 	pickupCoord: LatLngObj | null;
@@ -46,7 +46,10 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 	drivers: [],
 
 	_socket: {
-		current: io("http://localhost:5000", { autoConnect: false }),
+		current: io("http://localhost:8080", {
+			autoConnect: false,
+			transports: ["websocket"],
+		}),
 	},
 	_refMap: { current: new Map() },
 	_leafletMapRef: { current: null },
@@ -190,128 +193,23 @@ export const useMyStore = create<MyStoreType>((set, get) => ({
 
 		_socket.current.on(
 			"driver-ping-batch",
-			(
-				batch: {
-					timestamp: number;
-					regionDrivers: Record<
-						string,
-						{
-							member: string;
-							coordinates: {
-								latitude: number;
-								longitude: number;
-							};
-						}
-					>[];
-				},
-				expired: string[],
-			) => {
+			(batch: {
+				timestamp: number;
+				regionDrivers: Record<
+					string,
+					{
+						member: string;
+						coordinates: {
+							latitude: number;
+							longitude: number;
+						};
+					}
+				>[];
+			}) => {
 				const { view, pickupCoord } = get(); // get non-stale view on each ping
-				console.log("Received driver-ping-batch", view);
+				console.log("Received driver-ping-batch", batch);
 
-				let oldDrivers = [...drivers]; // copy
-				let changeState = false; // just a flag whether to call setDrivers([]) to avoid setting state again if not changed
-
-				// for filtering away
-				let expiredSet = new Set(expired);
-				let gotOutOfBoundSet = new Set();
-
-				// processing new batch of pings
-
-				// todo: this logic has to be made again
-
-				for (const member in batch.regionDrivers) {
-					if (_seenDriverIds.current.has(member)) {
-						const marker = _refMap.current.get(member);
-
-						if (marker) {
-							let deleteMarker = true;
-
-							if (view === "ride") {
-								if (pickupCoord) {
-									if (
-										true
-										// isPointWithinRadius(
-										// 	{
-										// 		lat: batch[member].lat,
-										// 		lng: batch[member].lng,
-										// 	},
-										// 	pickupCoord,
-										// 	radius,
-										// )
-									) {
-										deleteMarker = false;
-									}
-								}
-							} else {
-								// isPointInPolygon({lat:batch[key].lat, lng:batch[key].lng}, [])
-								deleteMarker = false;
-							}
-
-							if (!deleteMarker) {
-								marker.setLatLng([
-									batch[member].lat,
-									batch[member].lng,
-								]);
-							} else {
-								// delete, if present in oldDrivers, and seenDriverIds
-								gotOutOfBoundSet.add(member); // to filter away out of bound and expired in one pass outside
-								_refMap.current.delete(member);
-								_seenDriverIds.current.delete(member);
-							}
-						}
-					} else {
-						// add new driver
-
-						let addNew = false;
-						if (view === "global") {
-							// if (isPointInPolygon({lat:batch[key].lat, lng:batch[key].lng}, [])) {
-							addNew = true;
-							// }
-						} else {
-							if (
-								pickupCoord &&
-								true
-								// isPointWithinRadius(
-								// 	{
-								// 		lat: batch[key].lat,
-								// 		lng: batch[key].lng,
-								// 	},
-								// 	pickupCoord,
-								// 	radius,
-								// )
-							) {
-								addNew = true;
-							}
-						}
-
-						if (addNew) {
-							_seenDriverIds.current.add(member);
-							oldDrivers.push({
-								...batch[member],
-								driverId: member,
-							});
-							changeState = true;
-						}
-					}
-				}
-
-				// filtering away those who got out of bound or have expired
-				oldDrivers = oldDrivers.filter((d) => {
-					if (
-						!gotOutOfBoundSet.has(d.driverId) &&
-						!expiredSet.has(d.driverId)
-					) {
-						return true;
-					}
-
-					changeState = true;
-					return false;
-				});
-
-				console.log(changeState);
-
-				if (changeState) set({ drivers: oldDrivers });
+                
 			},
 		);
 	},
