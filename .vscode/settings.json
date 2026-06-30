@@ -1,0 +1,9 @@
+{
+	"files.exclude": {
+		"frontend/": true,
+		"api/": true,
+		"ws-ingestion/": true,
+		"workers/": true,
+		"drivers-simulator/": true
+	}
+}

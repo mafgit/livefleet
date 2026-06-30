@@ -1,0 +1,42 @@
+{
+	"folders": [
+		{
+			"name": "frontend",
+			"path": "./frontend",
+		},
+		{
+			"name": "api",
+			"path": "./api",
+		},
+		{
+			"name": "ws-ingestion",
+			"path": "./ws-ingestion",
+		},
+		{
+			"name": "workers",
+			"path": "./workers",
+		},
+		{
+			"name": "drivers-simulator",
+			"path": "./drivers-simulator",
+		},
+		{ "name": ".", "path": "." },
+	],
+	"settings": {
+		"terminal.integrated.tabs.title": "${workspaceFolderName}",
+		"terminal.integrated.tabs.description": "${cwdFolder}",
+		"files.exclude": {
+			"**/.git": true,
+			"**/node_modules": true,
+		},
+		"workbench.iconTheme": "material-icon-theme",
+		"material-icon-theme.rootFolders.associations": {
+			"frontend": "react-components",
+			"api": "routes",
+			"ws-ingestion": "pipe",
+			"workers": "server",
+			"drivers-simulator": "mock",
+			".": "core",
+		},
+	},
+}
