@@ -16,7 +16,7 @@ export default function MapMover() {
 				// console.log(getScreenBoundingBox(map));
 
 				useStateStore.getState().onMapMove();
-			}, 1200);
+			}, 1000);
 		},
 	});
 

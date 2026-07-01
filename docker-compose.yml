@@ -2,45 +2,51 @@ services:
     frontend_service:
       image: tracker-frontend:latest
       build:
-        context: ./frontend
-        dockerfile: dockerfile
+        context: ./services/frontend
+        dockerfile: Dockerfile
         args:
-          - NEXT_PUBLIC_API_SERVICE_URL=${NEXT_PUBLIC_API_SERVICE_URL}
-          - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=${NEXT_PUBLIC_WS_INGESTION_SERVICE_URL}
+          - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=http://localhost:8080
+          - NEXT_PUBLIC_API_SERVICE_URL=http://localhost:5000
       depends_on:
         - api_service
         - ws_ingestion_service
+      ports:
+        - "3000:3000"
 
     api_service:
       image: tracker-api:latest
-      build: ./api
+      build: ./services/api
       environment:
-        - REDIS_URL=redis://localhost:6379/
+        - REDIS_URL=redis://redis_service:6379/
       depends_on:
         - redis_service
+      ports:
+        - "5000:5000"
 
     ws_ingestion_service:
       image: tracker-ws-ingestion:latest
-      build: ./ws-ingestion
+      build: ./services/ws-ingestion
       environment:
-        - REDIS_URL=redis://localhost:6379/
+        - REDIS_URL=redis://redis_service:6379/
       depends_on:
         - redis_service
+      ports:
+        - "8080:8080"
 
     drivers_simulator_service:
       image: tracker-drivers-simulator:latest
-      build: ./drivers-simulator
+      build: ./services/drivers-simulator
       environment:
-        - REDIS_URL=redis://localhost:6379/
+        - WS_INGESTION_SERVICE_URL=http://ws_ingestion_service:8080
       depends_on:
         - ws_ingestion_service
 
 
     workers_service:
       image: tracker-workers:latest
-      build: ./workers
+      build: ./services/workers
       environment:
-        - REDIS_URL=redis://localhost:6379/
+        - REDIS_URL=redis://redis_service:6379/
       depends_on:
         - redis_service
 

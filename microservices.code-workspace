@@ -2,23 +2,23 @@
 	"folders": [
 		{
 			"name": "frontend",
-			"path": "./frontend",
+			"path": "./services/frontend",
 		},
 		{
 			"name": "api",
-			"path": "./api",
+			"path": "./services/api",
 		},
 		{
 			"name": "ws-ingestion",
-			"path": "./ws-ingestion",
+			"path": "./services/ws-ingestion",
 		},
 		{
 			"name": "workers",
-			"path": "./workers",
+			"path": "./services/workers",
 		},
 		{
 			"name": "drivers-simulator",
-			"path": "./drivers-simulator",
+			"path": "./services/drivers-simulator",
 		},
 		{ "name": ".", "path": "." },
 	],

@@ -30,7 +30,7 @@ export async function fetchNearbyDrivers(
 	pickupCoord: LatLngObj,
 ): RedisDriversType {
 	const res = await fetch(
-		`${process.env.API_SERVICE_URL}/drivers/nearby?lat=${pickupCoord.lat}&lng=${pickupCoord.lng}`,
+		`${process.env.NEXT_PUBLIC_API_SERVICE_URL}/drivers/nearby?lat=${pickupCoord.lat}&lng=${pickupCoord.lng}`,
 	);
 	const data = await res.json();
 

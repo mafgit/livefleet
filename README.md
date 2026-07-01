@@ -14,24 +14,21 @@ Basic → Advanced (in plan)
 
 ## Tech Stack
 
-(in plan)
-
-#### Frontend:
-
 - Next.js
-- Zustand
-- Leaflet.js
+- Zustand for complex state management
+- Leaflet.js for map
 - Tailwind
-
-#### Backend, Worker, Ingestion:
-
-- Redis
-- Socket.io
-- Zod
+- Ngeohash region cells
+- Redis geospatial queries
+- Socket.io rooms
+- Zod type checking
 - Express
 - Node.js
 - TypeScript
-
-#### Containerization:
-
 - Docker
+
+## Issues/Todos
+
+- driver marker expire
+- websocket connection error in drivers simulator
+- look about ticker or ws-ingestion scaling
