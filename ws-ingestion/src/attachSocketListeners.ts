@@ -14,13 +14,25 @@ export function attachSocketListeners() {
 			socket.join(rooms);
 		});
 
-		socket.on("leave-frontend-regions", (regionIds: string[]) => {
-			Promise.all(
-				regionIds.map((regionId) =>
-					socket.leave(`room:frontends:${regionId}`),
-				),
-			);
-		});
+		socket.on(
+			"leave-frontend-regions",
+			(regionIds: string[] | undefined) => {
+				if (typeof regionIds === "undefined") {
+					// i.e. leave all rooms
+					socket.rooms.forEach((r) => {
+						if (r !== socket.id) {
+							socket.leave(r);
+						}
+					});
+				} else {
+					Promise.all(
+						regionIds.map((regionId) =>
+							socket.leave(`room:frontends:${regionId}`),
+						),
+					);
+				}
+			},
+		);
 
 		socket.on(
 			"driver-ping",

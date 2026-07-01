@@ -116,8 +116,8 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 			drivers: [],
 		});
 		mapManager.seenDriverIds.clear();
-		socketManager.socket.emit("leave-frontend-regions", "GLOBAL");
-		socketManager.socket.off("driver-ping");
+		socketManager.socket.emit("leave-frontend-regions", undefined);
+		socketManager.socket.off("driver-ping-batch");
 	},
 
 	moveToNextStep: () => {
