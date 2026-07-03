@@ -43,9 +43,13 @@ services:
         build: ./services/drivers-simulator
         environment:
             - WS_INGESTION_SERVICE_URL=http://localhost/ws
+            - NUM_DRIVERS=50
+            - CENTER_LAT=24.926
+            - CENTER_LNG=67.1371
+            - CHANGE_IN_LAT_OR_LNG=0.1
         depends_on:
             - ws_ingestion_service:
-        restart: unless-stopped
+        # restart: unless-stopped
 
     workers_service:
         image: livefleet-workers:latest

@@ -20,33 +20,35 @@ process.on("SIGINT", () => {
 });
 
 async function simulate({
-	numDrivers,
-	centerLat,
-	centerLng,
-	changeInLatOrLng,
+	NUM_DRIVERS,
+	CENTER_LAT,
+	CENTER_LNG,
+	CHANGE_IN_LAT_OR_LNG,
 }: {
-	numDrivers: number;
-	centerLat: number;
-	centerLng: number;
-	changeInLatOrLng: number;
+	NUM_DRIVERS: number;
+	CENTER_LAT: number;
+	CENTER_LNG: number;
+	CHANGE_IN_LAT_OR_LNG: number;
 }) {
-	console.log(`Simulating ${numDrivers} drivers`);
+	console.log(`Simulating ${NUM_DRIVERS} drivers`);
 
 	drivers = {};
 	let driver;
 	while (true) {
-		for (let d = 0; d < numDrivers; d++) {
+		for (let d = 0; d < NUM_DRIVERS; d++) {
 			const driverId = "driver-" + d;
 
 			if (!(driverId in drivers)) {
 				// creating driver at random locations
 				const dx =
-					Math.random() * changeInLatOrLng * 2 - changeInLatOrLng;
+					Math.random() * CHANGE_IN_LAT_OR_LNG * 2 -
+					CHANGE_IN_LAT_OR_LNG;
 				const dy =
-					Math.random() * changeInLatOrLng * 2 - changeInLatOrLng;
+					Math.random() * CHANGE_IN_LAT_OR_LNG * 2 -
+					CHANGE_IN_LAT_OR_LNG;
 
-				const newLat = centerLat + dx;
-				const newLng = centerLng + dy;
+				const newLat = CENTER_LAT + dx;
+				const newLng = CENTER_LNG + dy;
 
 				const socket = io(process.env.WS_INGESTION_SERVICE_URL, {
 					query: { driverId: driverId },
@@ -108,9 +110,20 @@ function delay(ms: number) {
 // 	return Math.min(Math.max(x, max), min);
 // }
 
-simulate({
-	numDrivers: 50,
-	centerLat: 24.926,
-	centerLng: 67.1371,
-	changeInLatOrLng: 0.1,
-});
+try {
+	const NUM_DRIVERS = parseInt(process.env.NUM_DRIVERS as string);
+	const CENTER_LAT = parseFloat(process.env.CENTER_LAT as string);
+	const CENTER_LNG = parseFloat(process.env.CENTER_LNG as string);
+	const CHANGE_IN_LAT_OR_LNG = parseFloat(
+		process.env.CHANGE_IN_LAT_OR_LNG as string,
+	);
+
+	simulate({
+		NUM_DRIVERS,
+		CENTER_LAT,
+		CENTER_LNG,
+		CHANGE_IN_LAT_OR_LNG,
+	});
+} catch (err) {
+	console.error(err);
+}
