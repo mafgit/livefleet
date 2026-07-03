@@ -3,7 +3,7 @@ import { DriverPing } from "@/types/DriverPing";
 import { ViewType } from "@/types/ViewType";
 import { io } from "socket.io-client";
 import mapManager from "./mapManager";
-
+import { OFFLINE_CLEANUP_INTERVAL } from "@/constants/cleanup";
 
 const socketManager = {
 	socket: io(process.env.NEXT_PUBLIC_WS_INGESTION_SERVICE_URL, {
@@ -46,11 +46,12 @@ const socketManager = {
 	attachDriverPingBatchListener(view: ViewType) {
 		socketManager.connectIfNotConnected();
 		socketManager.socket.off("driver-ping-batch");
-
-		const state = useStateStore.getState();
+		if (mapManager.offlineDriversCleanupInterval) {
+			clearInterval(mapManager.offlineDriversCleanupInterval);
+		}
 
 		if (view === "RIDE") {
-			const { pickupCoord } = state;
+			const { pickupCoord } = useStateStore.getState();
 			if (!pickupCoord) return;
 
 			const roomsToJoin =
@@ -61,39 +62,26 @@ const socketManager = {
 			socketManager.leaveAndJoinRooms(roomsToJoin);
 		}
 
+		// ping batch handler
 		socketManager.socket.on(
 			"driver-ping-batch",
-			(driverPingBatch: DriverPing[]) => {
-				const newDrivers: DriverPing[] = [
-					...useStateStore.getState().drivers,
-				];
-
-				const { seenDriverIds, memberToMarkerRefMap } = mapManager;
-
-				let driversChanged = false;
-				for (const driver of driverPingBatch) {
-					if (seenDriverIds.has(driver.member)) {
-						const marketElement = memberToMarkerRefMap.get(
-							driver.member,
-						);
-						if (marketElement) {
-							marketElement.setLatLng({
-								lat: driver.latitude,
-								lng: driver.longitude,
-							});
-						}
-					} else {
-						seenDriverIds.add(driver.member);
-						newDrivers.push(driver);
-						driversChanged = true;
-					}
-				}
-
-				if (driversChanged) {
-					state.setDrivers(newDrivers);
-				}
-			},
+			mapManager.handleDriverPingBatch,
 		);
+
+		// offline drivers removal interval
+		mapManager.offlineDriversCleanupInterval = setInterval(
+			mapManager.offlineCleanupTick,
+			OFFLINE_CLEANUP_INTERVAL,
+		);
+	},
+
+	cleanupEventListeners() {
+		if (mapManager.offlineDriversCleanupInterval) {
+			clearInterval(mapManager.offlineDriversCleanupInterval);
+		}
+		mapManager.seenDrivers.clear();
+		socketManager.socket.emit("leave-frontend-regions", undefined);
+		socketManager.socket.off("driver-ping-batch");
 	},
 };
 

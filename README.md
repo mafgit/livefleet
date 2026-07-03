@@ -30,7 +30,4 @@ Basic → Advanced (in plan)
 
 ## Todos
 
-- driver marker expire
-- websocket connection error in drivers simulator
-- look about ticker or ws-ingestion scaling
 - driver pings emitting to multi-precision rooms

@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useStateStore } from "@/store/useStateStore";
 import socketManager from "@/managers/socketManager";
+import mapManager from "@/managers/mapManager";
 
 const SelectionMapNoSSR = dynamic(() => import("@/components/SelectionMap"), {
 	ssr: false,
@@ -36,6 +37,10 @@ export default function page() {
 		return () => {
 			if (socketManager.socket.connected) {
 				socketManager.socket.disconnect();
+			}
+
+			if (mapManager.offlineDriversCleanupInterval) {
+				clearInterval(mapManager.offlineDriversCleanupInterval);
 			}
 		};
 	}, []);

@@ -33,7 +33,7 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 	async onMapMove() {
 		if (mapManager.leafletMap && typeof window !== "undefined") {
 			try {
-				mapManager.seenDriverIds.clear();
+				mapManager.seenDrivers.clear();
 
 				const { centerLat, centerLng, widthKm, heightKm } =
 					mapManager.getScreenBoundingBox();
@@ -56,8 +56,11 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 						longitude: d.coordinates.longitude,
 					};
 				});
-
-				mapManager.seenDriverIds = new Set(driverIds);
+                
+				const timestamp = Date.now();
+				mapManager.seenDrivers = new Map(
+					driverIds.map((id) => [id, timestamp]),
+				);
 
 				set({ view: "GLOBAL", drivers });
 
@@ -85,7 +88,10 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 				};
 			});
 
-			mapManager.seenDriverIds = new Set(driverIds);
+			const timestamp = Date.now();
+			mapManager.seenDrivers = new Map(
+				driverIds.map((id) => [id, timestamp]),
+			);
 
 			set({ drivers, step: 2 });
 
@@ -119,9 +125,8 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 			destCoord: null,
 			drivers: [],
 		});
-		mapManager.seenDriverIds.clear();
-		socketManager.socket.emit("leave-frontend-regions", undefined);
-		socketManager.socket.off("driver-ping-batch");
+
+		socketManager.cleanupEventListeners();
 	},
 
 	moveToNextStep: () => {
