@@ -14,21 +14,23 @@ Basic → Advanced (in plan)
 
 ## Tech Stack
 
+- Docker
+- Redis
 - Next.js
-- Zustand for complex state management
-- Leaflet.js for map
-- Tailwind
-- Ngeohash region cells
-- Redis geospatial queries
-- Socket.io rooms
-- Zod type checking
+- Socket.io
+- Leaflet.js
+- Zustand
+- Nginx
+- Ngeohash
+- Zod
 - Express
 - Node.js
 - TypeScript
-- Docker
+- Tailwind
 
-## Issues/Todos
+## Todos
 
 - driver marker expire
 - websocket connection error in drivers simulator
 - look about ticker or ws-ingestion scaling
+- driver pings emitting to multi-precision rooms

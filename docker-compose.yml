@@ -1,56 +1,83 @@
 services:
     frontend_service:
-      image: tracker-frontend:latest
-      build:
+        image: tracker-frontend:latest
+        build:
         context: ./services/frontend
         dockerfile: Dockerfile
         args:
-          - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=http://localhost:8080
-          - NEXT_PUBLIC_API_SERVICE_URL=http://localhost:5000
-      depends_on:
-        - api_service
-        - ws_ingestion_service
-      ports:
-        - "3000:3000"
+            - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=http://localhost/ws
+            - NEXT_PUBLIC_API_SERVICE_URL=http://localhost/api
+        depends_on:
+            - api_service
+            - ws_ingestion_service
+        expose:
+            - "3000"
+        restart: unless-stopped
 
     api_service:
-      image: tracker-api:latest
-      build: ./services/api
-      environment:
-        - REDIS_URL=redis://redis_service:6379/
-      depends_on:
-        - redis_service
-      ports:
-        - "5000:5000"
+        image: tracker-api:latest
+        build: ./services/api
+        environment:
+            - REDIS_URL=redis://redis_service:6379/
+        depends_on:
+            redis_service:
+                condition: service_healthy
+        expose:
+            - "5000"
+        restart: unless-stopped
 
     ws_ingestion_service:
-      image: tracker-ws-ingestion:latest
-      build: ./services/ws-ingestion
-      environment:
-        - REDIS_URL=redis://redis_service:6379/
-      depends_on:
-        - redis_service
-      ports:
-        - "8080:8080"
+        image: tracker-ws-ingestion:latest
+        build: ./services/ws-ingestion
+        environment:
+            - REDIS_URL=redis://redis_service:6379/
+        depends_on:
+            redis_service:
+                condition: service_healthy
+        expose:
+            - "8080"
+        restart: unless-stopped
 
     drivers_simulator_service:
-      image: tracker-drivers-simulator:latest
-      build: ./services/drivers-simulator
-      environment:
-        - WS_INGESTION_SERVICE_URL=http://ws_ingestion_service:8080
-      depends_on:
-        - ws_ingestion_service
-
+        image: tracker-drivers-simulator:latest
+        build: ./services/drivers-simulator
+        environment:
+            - WS_INGESTION_SERVICE_URL=http://localhost/ws
+        depends_on:
+            - ws_ingestion_service:
+        restart: unless-stopped
 
     workers_service:
-      image: tracker-workers:latest
-      build: ./services/workers
-      environment:
-        - REDIS_URL=redis://redis_service:6379/
-      depends_on:
-        - redis_service
+        image: tracker-workers:latest
+        build: ./services/workers
+        environment:
+            - REDIS_URL=redis://redis_service:6379/
+        depends_on:
+            redis_service:
+                condition: service_healthy
+        restart: unless-stopped
 
     redis_service:
-      image: redis:8.8-alpine
-      ports:
-        - "6379:6379"
+        image: redis:8.8-alpine
+        expose:
+            - "6379"
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            retries: 5
+            interval: 5
+            timeout: 3
+        restart:
+            unless-stopped
+
+    nginx_service:
+        image: nginx:alpine
+        ports:
+        - "80:80"
+        volumes:
+            ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+            - frontend_service
+            - api_service
+            - ws_ingestion_service
+        restart: unless-stopped
+        

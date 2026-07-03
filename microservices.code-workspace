@@ -20,6 +20,10 @@
 			"name": "drivers-simulator",
 			"path": "./services/drivers-simulator",
 		},
+		{
+			"name": "nginx",
+			"path": "./services/nginx",
+		},
 		{ "name": ".", "path": "." },
 	],
 	"settings": {
