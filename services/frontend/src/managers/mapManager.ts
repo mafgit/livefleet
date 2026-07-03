@@ -36,6 +36,7 @@ const mapManager: MapManagerType = {
 
 	initializeLeafletMap(mapInstance: L.Map) {
 		mapManager.leafletMap = mapInstance;
+        useStateStore.getState().setMapLoaded(true)
 	},
 	getScreenBoundingBox() {
 		if (!mapManager.leafletMap) throw new Error("Map not initialized yet");
@@ -82,7 +83,8 @@ const mapManager: MapManagerType = {
 			mapManager.getScreenBoundingBox();
 
 		const zoomLevel = mapManager.leafletMap!.getZoom();
-		const roomsPrecision = zoomLevel >= 14 ? 5 : zoomLevel >= 11 ? 4 : 3;
+		const roomsPrecision =
+			zoomLevel >= 16 ? 6 : zoomLevel >= 13 ? 5 : zoomLevel >= 11 ? 4 : 3;
 
 		const rooms = ngeohash.bboxes(
 			minLat,

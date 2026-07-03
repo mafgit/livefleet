@@ -14,8 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: "LiveFleet",
-	description:
-		"Efficient live updating of hundreds of marker locations over websocket connections",
+	description: "Scalable Real-Time Geospatial Tracking",
 };
 
 export default function RootLayout({

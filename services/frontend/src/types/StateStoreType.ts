@@ -9,6 +9,7 @@ export interface StateStoreType {
 	view: ViewType;
 	drivers: DriverPing[];
 	step: number;
+    mapLoaded: boolean;
 
 	// actions
 	setDrivers: (drivers: DriverPing[]) => void;
@@ -25,4 +26,5 @@ export interface StateStoreType {
 	moveToPrevStep: () => void;
 	clearSteps: () => void;
 	onMapMove: () => void;
+    setMapLoaded: (mapLoaded: boolean) => void;
 }

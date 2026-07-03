@@ -1,34 +1,49 @@
-# LiveFleet - Scalable Real-Time Geospatial Tracking (in progress)
+# LiveFleet 🗺️ - Scalable Real-Time Geospatial Tracking
 
-Efficient live updating of hundreds of marker locations over websocket connections
+## 📋 Overview
 
-## Overview
+* 🚀 **Scalable** real-time geospatial driver tracking
+* 🐳 **Decoupled & Dockerized** microservice architecture:
+    * 🖥️ **Frontend:** Next.js + Zustand + Tailwind
+    * ⚙️ **API:** Express + Zod
+    * 📡 **Web Socket Ingestion Server:** Socket.io
+    * ⌛ **Workers**
+    * 🏎️ **Drivers Simulator**
+    * 🗄️ **Redis**
+    * 🌐 **NGINX**
+
+
+
+---
 
 <img src="./readme-imgs/1.png" style="border-radius: 8px;"/>
 
-<!-- ## Architecture
+---
 
-Basic → Advanced (in plan)
+* 🗺️ **Leaflet-based** interactive map UI
+* 📍 **Redis-backed** geospatial queries
+* ⚡ **Dedicated Socket.IO** websocket ingestion server
+* 🔌 **Separate Express** API server
+* 👑 **Worker** for ping batch ticking with **leader election** coordination
+* 📢 **Redis pub/sub and adapter** for synchronization between multiple servers or instances
+* 🔢 **Multi-precision geohash** room/subscription strategy
+* 📦 **Bounding-box and radius-based** driver queries
+* 🚪 **Dynamic room join/leave** for viewport-driven updates
+* ⚛️ **Next.js frontend** with Zustand for complex state management
+* 🚗 **Driver simulator** for synthetic real-time movement
 
-<img src="./readme-imgs/scalable-real-time-geospatial-tracking.drawio.svg" style="border-radius: 8px;"/> -->
+## 🛠️ Tech Stack
 
-## Tech Stack
-
-- Docker
-- Redis
-- Next.js
-- Socket.io
-- Leaflet.js
-- Zustand
-- Nginx
-- Ngeohash
-- Zod
-- Express
-- Node.js
-- TypeScript
-- Tailwind
-
-## Todos
-
-- got out of region bounds cleanup
-- can also add comparison if new bounding box is similar so dont refetch or join/leave rooms
+* 🐳 **Docker**
+* 💾 **Redis**
+* ⏭️ **Next.js**
+* 🔌 **Socket.io**
+* 🍃 **Leaflet.js**
+* 🎛️ **Zustand**
+* 🕸️ **Nginx**
+* 🗺️ **Ngeohash**
+* ✅ **Zod**
+* 🚂 **Express**
+* 🟢 **Node.js**
+* 📘 **TypeScript**
+* 🌬️ **Tailwind**

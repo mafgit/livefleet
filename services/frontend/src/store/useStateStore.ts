@@ -16,6 +16,7 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 	userCoord: null,
 	view: "RIDE",
 	drivers: [],
+	mapLoaded: false,
 
 	// actions
 	setDestCoord: (c: LatLngObj | null) => set({ destCoord: c }),
@@ -30,6 +31,8 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 		onMapMove();
 	},
 
+	setMapLoaded: (mapLoaded: boolean) => set({ mapLoaded }),
+    
 	async onMapMove() {
 		if (mapManager.leafletMap && typeof window !== "undefined") {
 			try {
@@ -56,7 +59,7 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 						longitude: d.coordinates.longitude,
 					};
 				});
-                
+
 				const timestamp = Date.now();
 				mapManager.seenDrivers = new Map(
 					driverIds.map((id) => [id, timestamp]),
@@ -100,7 +103,7 @@ export const useStateStore = create<StateStoreType>((set, get) => ({
 			mapManager.leafletMap?.setZoom(15);
 		} catch (e) {
 			console.error(e);
-			alert("Backend service might be down");
+			alert("API service might be down");
 		}
 	},
 

@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { io, type Socket } from "socket.io-client";
 
 let drivers: Record<

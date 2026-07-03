@@ -1,87 +1,95 @@
+name: livefleet
+
 services:
-    frontend_service:
-        image: livefleet-frontend:latest
-        build:
-        context: ./services/frontend
-        dockerfile: Dockerfile
-        args:
-            - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=http://localhost/ws
-            - NEXT_PUBLIC_API_SERVICE_URL=http://localhost/api
-        depends_on:
-            - api_service
-            - ws_ingestion_service
-        expose:
-            - "3000"
-        restart: unless-stopped
+  frontend_service:
+    image: livefleet-frontend:latest
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=http://localhost/ws
+        - NEXT_PUBLIC_API_SERVICE_URL=http://localhost/api
+    depends_on:
+      - api_service
+      - ws_ingestion_service
+    expose:
+      - "3000"
+    restart: unless-stopped
+    deploy:
+      replicas: 1
 
-    api_service:
-        image: livefleet-api:latest
-        build: ./services/api
-        environment:
-            - REDIS_URL=redis://redis_service:6379/
-        depends_on:
-            redis_service:
-                condition: service_healthy
-        expose:
-            - "5000"
-        restart: unless-stopped
+  api_service:
+    image: livefleet-api:latest
+    build: ./services/api
+    environment:
+      - REDIS_URL=redis://redis_service:6379/
+    depends_on:
+      redis_service:
+        condition: service_healthy
+    expose:
+      - "5000"
+    restart: unless-stopped
+    deploy:
+      replicas: 1
 
-    ws_ingestion_service:
-        image: livefleet-ws-ingestion:latest
-        build: ./services/ws-ingestion
-        environment:
-            - REDIS_URL=redis://redis_service:6379/
-        depends_on:
-            redis_service:
-                condition: service_healthy
-        expose:
-            - "8080"
-        restart: unless-stopped
+  ws_ingestion_service:
+    image: livefleet-ws-ingestion:latest
+    build: ./services/ws-ingestion
+    environment:
+      - REDIS_URL=redis://redis_service:6379/
+    depends_on:
+      redis_service:
+        condition: service_healthy
+    expose:
+      - "8080"
+    restart: unless-stopped
+    deploy:
+      replicas: 3
 
-    drivers_simulator_service:
-        image: livefleet-drivers-simulator:latest
-        build: ./services/drivers-simulator
-        environment:
-            - WS_INGESTION_SERVICE_URL=http://localhost/ws
-            - NUM_DRIVERS=50
-            - CENTER_LAT=24.926
-            - CENTER_LNG=67.1371
-            - CHANGE_IN_LAT_OR_LNG=0.1
-        depends_on:
-            - ws_ingestion_service:
-        # restart: unless-stopped
+  drivers_simulator_service:
+    image: livefleet-drivers-simulator:latest
+    build: ./services/drivers-simulator
+    environment:
+      - WS_INGESTION_SERVICE_URL=http://ws_ingestion_service:8080
+      - NUM_DRIVERS=500
+      - CENTER_LAT=24.6
+      - CENTER_LNG=67.3
+      - CHANGE_IN_LAT_OR_LNG=0.4
+    depends_on:
+      - ws_ingestion_service
+    # restart: unless-stopped
 
-    workers_service:
-        image: livefleet-workers:latest
-        build: ./services/workers
-        environment:
-            - REDIS_URL=redis://redis_service:6379/
-        depends_on:
-            redis_service:
-                condition: service_healthy
-        restart: unless-stopped
+  workers_service:
+    image: livefleet-workers:latest
+    build: ./services/workers
+    environment:
+      - REDIS_URL=redis://redis_service:6379/
+    depends_on:
+      redis_service:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      replicas: 2
 
-    redis_service:
-        image: redis:8.8-alpine
-        expose:
-            - "6379"
-        healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
-            retries: 5
-            interval: 5
-            timeout: 3
-        restart:
-            unless-stopped
+  redis_service:
+    image: redis:8.8-alpine
+    expose:
+      - "6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      retries: 5
+      interval: "5s"
+      timeout: "3s"
+    restart: unless-stopped
 
-    nginx_service:
-        image: nginx:alpine
-        ports:
-        - "80:80"
-        volumes:
-            ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-        depends_on:
-            - frontend_service
-            - api_service
-            - ws_ingestion_service
-        restart: unless-stopped
-        
+  nginx_service:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend_service
+      - api_service
+      - ws_ingestion_service
+    restart: unless-stopped
