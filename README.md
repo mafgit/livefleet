@@ -30,4 +30,5 @@ Basic → Advanced (in plan)
 
 ## Todos
 
-- driver pings emitting to multi-precision rooms
+- got out of region bounds cleanup
+- can also add comparison if new bounding box is similar so dont refetch or join/leave rooms

@@ -41,11 +41,15 @@ export default function SelectionMap() {
 				if (mapInstance) mapManager.initializeLeafletMap(mapInstance);
 			}}
 			center={userCoord}
-			zoom={26}
+			zoom={16}
+            minZoom={8}
+			maxZoom={18}
 			zoomControl={false}
 			style={{ width: "100%", height: "100%", zIndex: 10 }}
 		>
 			<TileLayer
+				maxNativeZoom={19}
+				maxZoom={22}
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 			/>

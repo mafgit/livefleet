@@ -24,7 +24,7 @@ interface MapManagerType {
 
 	getRoomsAroundPickupCoord: (pickupCoord: LatLngObj) => string[];
 	getRoomsInScreenBoundingBox: () => string[];
-    handleDriverPingBatch: (driverPingBatch: DriverPing[]) => void
+	handleDriverPingBatch: (driverPingBatch: DriverPing[]) => void;
 	offlineCleanupTick: () => void;
 }
 
@@ -81,12 +81,15 @@ const mapManager: MapManagerType = {
 		const { maxLat, maxLng, minLat, minLng } =
 			mapManager.getScreenBoundingBox();
 
+		const zoomLevel = mapManager.leafletMap!.getZoom();
+		const roomsPrecision = zoomLevel >= 14 ? 5 : zoomLevel >= 11 ? 4 : 3;
+
 		const rooms = ngeohash.bboxes(
 			minLat,
 			minLng,
 			maxLat,
 			maxLng,
-			6, // todo: try to push each driver to different precision rooms, so check about this constant
+			roomsPrecision,
 		);
 		return rooms;
 	},

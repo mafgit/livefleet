@@ -10,7 +10,6 @@ export function attachSocketListeners() {
 			const rooms = regionIds.map(
 				(regionId) => `room:frontends:${regionId}`,
 			);
-			// todo: check regionId valid?
 			socket.join(rooms);
 		});
 

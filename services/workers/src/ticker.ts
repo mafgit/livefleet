@@ -1,6 +1,6 @@
 import { redisClient } from "./redisClient";
 import {
-	HASH_PRECISION,
+	HASH_PRECISIONS,
 	HEARTBEAT_INTERVAL,
 	LEADER_KEY,
 	PX_EXPIRE_MS,
@@ -66,46 +66,53 @@ export async function stopTickerWorker() {
 
 async function tick() {
 	try {
-		const allDrivers = await redisClient.geoSearchWith(
-			"drivers:active",
-			{ latitude: 0, longitude: 0 },
-			{ width: 40000, height: 20000, unit: "km" },
-			["WITHCOORD"],
-		);
-
+		let cursor = "0";
 		const regionDrivers: Record<
 			string,
-			{ member: string; latitude: number; longitude: number }[]
+			{
+				member: string;
+				latitude: number;
+				longitude: number;
+			}[]
 		> = {};
 
-		for (const driver of allDrivers) {
-			if (!driver.coordinates) {
-				continue;
-			}
+		do {
+			const result = await redisClient.zScan("drivers:active", cursor, {
+				MATCH: "*",
+				COUNT: 1000,
+			});
+			cursor = result.cursor;
 
-			const {
-				member,
-				coordinates: { latitude, longitude },
-			} = driver;
+			const members = result.members.map((r) => r.value);
 
-			const hash = ngeohash.encode(
-				driver.coordinates.latitude,
-				driver.coordinates.longitude,
-				HASH_PRECISION,
-			);
+			const coords = await redisClient.geoPos("drivers:active", members);
 
-			const driverObj = {
-				member,
-				latitude,
-				longitude,
-			};
+			members.forEach((member, i) => {
+				const coord = coords[i];
+				if (coord) {
+					const { latitude, longitude } = coord;
 
-			if (hash in regionDrivers) {
-				regionDrivers[hash].push(driverObj);
-			} else {
-				regionDrivers[hash] = [driverObj];
-			}
-		}
+					const driverObj = {
+						member,
+						latitude: parseFloat(latitude),
+						longitude: parseFloat(longitude),
+					};
+					for (const HASH_PRECISION of HASH_PRECISIONS) {
+						const hash = ngeohash.encode(
+							latitude,
+							longitude,
+							HASH_PRECISION,
+						);
+
+						if (hash in regionDrivers) {
+							regionDrivers[hash].push(driverObj);
+						} else {
+							regionDrivers[hash] = [driverObj];
+						}
+					}
+				}
+			});
+		} while (cursor !== "0");
 
 		const payload = { timestamp: Date.now(), regionDrivers };
 

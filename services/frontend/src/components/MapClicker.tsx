@@ -10,6 +10,7 @@ export default function MapClicker() {
 
 	const map = useMapEvents({
 		// todo: closure of step variable might be an issue later
+        // although currently it rerenders on step and view change so fresh
 		click: (e) => {
 			const { lat, lng } = e.latlng;
 			if (step === 1) {
@@ -19,7 +20,6 @@ export default function MapClicker() {
 					pickupCoord.lng !== lng
 				) {
 					setPickupCoord({ lat, lng });
-					// todo: trigger query to backend for redis radius
 				}
 			} else if (step === 2) {
 				setDestCoord({ lat, lng });
