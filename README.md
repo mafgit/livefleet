@@ -6,11 +6,11 @@
 - 🐳 **Decoupled & Dockerized** microservice architecture:
     - 🖥️ **Frontend:** Next.js + Zustand + Tailwind
     - ⚙️ **API:** Express + Zod
-    - 📡 **Web Socket Ingestion Server:** Socket.io
-    - ⌛ **Workers**
-    - 🏎️ **Drivers Simulator**
+    - 📡 **Web Socket Ingestion Server:** Socket.io and Redis Adapter
     - 🗄️ **Redis**
     - 🌐 **NGINX**
+    - ⌛ **Workers**
+    - 🏎️ **Drivers Simulator**
 
 ---
 
@@ -48,6 +48,7 @@
 
 ## Tentative
 
+- check about markers not moving / websocket errors in consoles
 - got out of region bounds cleanup
 - extra padding around bounding box
 - add comparison if new bounding box is similar so dont refetch or join/leave rooms
