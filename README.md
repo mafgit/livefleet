@@ -11,9 +11,11 @@
     - ⌛ **Workers**
     - 🏎️ **Drivers Simulator**
 
----
-
 <img src="./readme-imgs/1.png" style="border-radius: 8px;"/>
+
+
+<img src="./readme-imgs/2.png" style="border-radius: 8px;"/>
+(Two replicas running for API, Frontend, Workers and WS-Ingestion each)
 
 ---
 
