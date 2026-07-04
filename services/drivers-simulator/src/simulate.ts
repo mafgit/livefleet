@@ -47,9 +47,9 @@ export async function simulate(
 					autoConnect: false,
 				});
 
-				socket.on("connect_error", (err) => {
-					console.error(err);
-				});
+				// socket.on("connect_error", (err) => {
+				// 	console.error(err);
+				// });
 
 				socket.connect();
 

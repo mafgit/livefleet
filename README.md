@@ -37,6 +37,12 @@
 - ⏭️ **Next.js** &nbsp; 🎛️ **Zustand** &nbsp; 🌬️ **Tailwind**
 - 🚂 **Express** &nbsp; ✅ **Zod** &nbsp; 🟢 **Node.js** &nbsp; 📘 **TypeScript**
 
+## How to Run
+
+1. Clone repo
+1. Run `docker compose up --build` inside the root folder
+1. Visit `localhost` or `localhost:80`
+
 ## Tentative
 
 - change drivers simulation approach to have a direction he is moving and change it based on small prob.
