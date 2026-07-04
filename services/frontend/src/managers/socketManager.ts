@@ -1,5 +1,4 @@
 import { useStateStore } from "@/store/useStateStore";
-import { DriverPing } from "@/types/DriverPing";
 import { ViewType } from "@/types/ViewType";
 import { io } from "socket.io-client";
 import mapManager from "./mapManager";

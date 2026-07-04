@@ -22,4 +22,8 @@ initRedis();
 app.use("/", router);
 
 const PORT = 5000;
-app.listen(PORT, () => console.log(`Backend Running [${PORT}]`));
+
+import { hostname } from "os";
+app.listen(PORT, () =>
+	console.log(`API server instance ${hostname()}:${process.pid}`),
+);

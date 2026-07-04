@@ -2,13 +2,12 @@
 
 ## 📋 Overview
 
-- 🚀 **Scalable** real-time geospatial driver tracking
 - 🐳 **Decoupled & Dockerized** microservice architecture:
-    - 🖥️ **Frontend:** Next.js + Zustand + Tailwind
-    - ⚙️ **API:** Express + Zod
-    - 📡 **Web Socket Ingestion Server:** Socket.io and Redis Adapter
+    - 🖥️ **Frontend**
+    - ⚙️ **API Server**
+    - 📡 **Web Socket Ingestion Server**
     - 🗄️ **Redis**
-    - 🌐 **NGINX**
+    - 🌐 **NGINX Reverse Proxy**
     - ⌛ **Workers**
     - 🏎️ **Drivers Simulator**
 
@@ -32,19 +31,11 @@
 
 ## 🛠️ Tech Stack
 
-- 🐳 **Docker**
-- 💾 **Redis**
-- ⏭️ **Next.js**
-- 🔌 **Socket.io**
-- 🍃 **Leaflet.js**
-- 🎛️ **Zustand**
-- 🕸️ **Nginx**
-- 🗺️ **Ngeohash**
-- ✅ **Zod**
-- 🚂 **Express**
-- 🟢 **Node.js**
-- 📘 **TypeScript**
-- 🌬️ **Tailwind**
+- 🐳 **Docker** &nbsp; 🕸️ **Nginx** 
+- 💾 **Redis** &nbsp; 🔌 **Socket.io**
+- 🍃 **Leaflet.js** &nbsp; 🗺️ **Ngeohash**
+- ⏭️ **Next.js** &nbsp; 🎛️ **Zustand** &nbsp; 🌬️ **Tailwind**
+- 🚂 **Express** &nbsp; ✅ **Zod** &nbsp; 🟢 **Node.js** &nbsp; 📘 **TypeScript**
 
 ## Tentative
 

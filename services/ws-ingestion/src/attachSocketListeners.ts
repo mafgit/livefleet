@@ -2,9 +2,9 @@ import type { Socket } from "socket.io";
 import { io } from "./createIOServer";
 import { pubClient } from "./redisClients";
 
-export function attachSocketListeners() {
+export function attachSocketListeners(serverInstance: string) {
 	io.on("connection", (socket: Socket) => {
-		// console.log(`Socket ${socket.id} connected`);
+		console.log(`A socket connected to ${serverInstance}`);
 
 		socket.on("join-frontend-regions", (regionIds: string[]) => {
 			const rooms = regionIds.map(

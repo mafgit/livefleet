@@ -1,15 +1,17 @@
 import { io } from "./createIOServer";
 import { subClient } from "./redisClients";
 
-export function attachChannelSubscriptions() {
-	subClient.subscribe("channel:batch_pings", handleBatchPings);
+export function attachChannelSubscriptions(serverInstance: string) {
+	subClient.subscribe("channel:batch_pings", (msg: string) => {
+		console.log(`Batch pings received by ${serverInstance}`);
+		handleBatchPings(msg);
+	});
 
 	console.log("Redis channel subscriptions attached");
 }
 
 function handleBatchPings(msg: string) {
 	try {
-		// console.log("Batch pings channel message received");
 		const payload: {
 			timestamp: number;
 			regionDrivers: Record<

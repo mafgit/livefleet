@@ -7,7 +7,7 @@ services:
       context: ./services/frontend
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=http://localhost/ws
+        - NEXT_PUBLIC_WS_INGESTION_SERVICE_URL=http://localhost
         - NEXT_PUBLIC_API_SERVICE_URL=http://localhost/api
     depends_on:
       - api_service
@@ -44,7 +44,7 @@ services:
       - "8080"
     restart: unless-stopped
     deploy:
-      replicas: 3
+      replicas: 1
 
   drivers_simulator_service:
     image: livefleet-drivers-simulator:latest
@@ -69,7 +69,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     deploy:
-      replicas: 2
+      replicas: 1
 
   redis_service:
     image: redis:8.8-alpine

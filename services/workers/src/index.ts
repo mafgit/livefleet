@@ -7,7 +7,8 @@ main();
 
 async function main() {
 	const serverInstanceKey = os.hostname() + ":" + process.pid;
-
+	console.log(`Starting workers ${serverInstanceKey}`);
+    
 	await initRedis();
 
 	// start workers

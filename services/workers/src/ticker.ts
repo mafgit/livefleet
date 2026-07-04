@@ -10,6 +10,7 @@ import ngeohash from "ngeohash";
 
 let tickerInterval: NodeJS.Timeout | null = null;
 let heartbeatInterval: NodeJS.Timeout | null = null;
+let isFollower = false; // just for console logging
 
 async function leadershipHeartbeat(serverInstanceKey: string) {
 	try {
@@ -19,6 +20,7 @@ async function leadershipHeartbeat(serverInstanceKey: string) {
 			// this one is already the leader
 			// just send a heartbeat / renew the expiry of this key
 			await redisClient.pExpire(LEADER_KEY, PX_EXPIRE_MS);
+			isFollower = false;
 		} else if (currentLeader === null) {
 			// no one is leader, try to become the leader
 			const wasSet = await redisClient.set(
@@ -35,7 +37,8 @@ async function leadershipHeartbeat(serverInstanceKey: string) {
 					clearInterval(tickerInterval);
 				}
 
-				console.log("Ticker worker has started");
+				console.log("Ticker became leader");
+				isFollower = false;
 				tick();
 				tickerInterval = setInterval(tick, TICK_INTERVAL);
 			}
@@ -43,6 +46,10 @@ async function leadershipHeartbeat(serverInstanceKey: string) {
 			// someone else is leader, become a follower
 			if (tickerInterval) {
 				clearInterval(tickerInterval);
+			}
+			if (!isFollower) {
+				isFollower = true;
+				console.log("Ticker became follower");
 			}
 		}
 	} catch (err) {
