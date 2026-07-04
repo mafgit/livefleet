@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { createRedisPubSubClients } from "./redisClients";
-import { io } from "./createIOServer";
+import { httpServer } from "./createIOServer";
 import { attachSocketListeners } from "./attachSocketListeners";
 import { attachChannelSubscriptions } from "./attachChannelSubscriptions";
 import os from "os";
@@ -16,9 +16,9 @@ async function main() {
 
 	attachSocketListeners(serverInstance);
 
-	const PORT = parseInt(process.env.PORT as string) || 8080;
-	io.listen(PORT);
-	console.log(
-		`Websocket ingestion server instance ${serverInstance}`,
-	);
+	const PORT = process.env.PORT ? parseInt(process.env.PORT as string) : 8080;
+    
+	httpServer.listen(PORT, "0.0.0.0", () => {
+		console.log(`Websocket ingestion server instance ${serverInstance}`);
+	});
 }

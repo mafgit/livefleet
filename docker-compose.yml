@@ -37,6 +37,7 @@ services:
     build: ./services/ws-ingestion
     environment:
       - REDIS_URL=redis://redis_service:6379/
+      - PORT=8080
     depends_on:
       redis_service:
         condition: service_healthy
@@ -54,7 +55,8 @@ services:
       - NUM_DRIVERS=500
       - CENTER_LAT=24.6
       - CENTER_LNG=67.3
-      - CHANGE_IN_LAT_OR_LNG=0.4
+      - CHANGE_IN_LAT=0.4
+      - CHANGE_IN_LNG=0.6
     depends_on:
       - ws_ingestion_service
     # restart: unless-stopped

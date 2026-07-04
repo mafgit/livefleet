@@ -8,12 +8,14 @@ export async function simulate(
 		NUM_DRIVERS,
 		CENTER_LAT,
 		CENTER_LNG,
-		CHANGE_IN_LAT_OR_LNG,
+		CHANGE_IN_LAT,
+        CHANGE_IN_LNG
 	}: {
 		NUM_DRIVERS: number;
 		CENTER_LAT: number;
 		CENTER_LNG: number;
-		CHANGE_IN_LAT_OR_LNG: number;
+		CHANGE_IN_LAT: number;
+		CHANGE_IN_LNG: number;
 	},
 ) {
 	let driver;
@@ -23,15 +25,15 @@ export async function simulate(
 
 			if (!(driverId in drivers)) {
 				// creating driver at random locations
-				const dx =
-					Math.random() * CHANGE_IN_LAT_OR_LNG * 2 -
-					CHANGE_IN_LAT_OR_LNG;
-				const dy =
-					Math.random() * CHANGE_IN_LAT_OR_LNG * 2 -
-					CHANGE_IN_LAT_OR_LNG;
+				const dLat =
+					Math.random() * CHANGE_IN_LAT * 2 -
+					CHANGE_IN_LAT;
+				const dLng =
+					Math.random() * CHANGE_IN_LNG * 2 -
+					CHANGE_IN_LNG;
 
-				const newLat = CENTER_LAT + dx;
-				const newLng = CENTER_LNG + dy;
+				const newLat = CENTER_LAT + dLat;
+				const newLng = CENTER_LNG + dLng;
 
 				const socket = io(process.env.WS_INGESTION_SERVICE_URL, {
 					query: { driverId: driverId },
@@ -40,13 +42,16 @@ export async function simulate(
 					transports: ["websocket"],
 					reconnection: true,
 					reconnectionAttempts: Infinity,
-					reconnectionDelay: 1000,
+					reconnectionDelay: 1000 + Math.random() * 500,
 					timeout: 5000,
+					autoConnect: false,
 				});
 
 				socket.on("connect_error", (err) => {
-					console.error("Websocket connection error");
+					console.error(err);
 				});
+
+				socket.connect();
 
 				drivers[driverId] = {
 					lat: newLat,
@@ -79,6 +84,6 @@ export async function simulate(
 			}
 		}
 
-		await delay(Math.random() * 2000);
+		await delay(50 + Math.random() * 500);
 	}
 }

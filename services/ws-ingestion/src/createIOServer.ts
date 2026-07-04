@@ -1,6 +1,9 @@
+import { createServer } from "http";
 import { Server } from "socket.io";
 
-export const io = new Server({
+export const httpServer = createServer();
+
+export const io = new Server(httpServer, {
 	cors: {
 		origin: "*",
 	},

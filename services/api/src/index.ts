@@ -24,6 +24,6 @@ app.use("/", router);
 const PORT = 5000;
 
 import { hostname } from "os";
-app.listen(PORT, () =>
+app.listen(PORT, "0.0.0.0", () =>
 	console.log(`API server instance ${hostname()}:${process.pid}`),
 );

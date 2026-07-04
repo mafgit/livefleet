@@ -39,7 +39,8 @@
 
 ## Tentative
 
-- check about markers not moving / websocket errors in consoles
+- change drivers simulation approach to have a direction he is moving and change it based on small prob.
+- websocket connect_error in consoles
 - got out of region bounds cleanup
 - extra padding around bounding box
 - add comparison if new bounding box is similar so dont refetch or join/leave rooms
